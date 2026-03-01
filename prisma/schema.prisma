@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @default(cuid())
+  email     String     @unique
+  password  String
+  name      String
+  role      Role       @default(VOLUNTEER)
+  createdAt DateTime   @default(now())
+  volunteer Volunteer?
+}
+
+enum Role {
+  VOLUNTEER
+  ADMIN
+}
+
+model Volunteer {
+  id          String       @id @default(cuid())
+  userId      String       @unique
+  user        User         @relation(fields: [userId], references: [id])
+  phone       String
+  latitude    Float
+  longitude   Float
+  address     String?
+  skills      String[]
+  resources   String[]
+  isAvailable Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  deployments Deployment[]
+}
+
+model SurgeEvent {
+  id              String       @id @default(cuid())
+  title           String
+  type            EventType
+  severity        Int
+  status          EventStatus  @default(ACTIVE)
+  latitude        Float
+  longitude       Float
+  radiusKm        Float
+  skillsNeeded    String[]
+  resourcesNeeded String[]
+  headcount       Int
+  filledCount     Int          @default(0)
+  autoTriggered   Boolean      @default(false)
+  createdBy       String
+  createdAt       DateTime     @default(now())
+  closedAt        DateTime?
+  deployments     Deployment[]
+}
+
+enum EventType {
+  FLOOD
+  TORNADO
+  SNOW
+  WILDFIRE
+  GENERAL
+}
+
+enum EventStatus {
+  ACTIVE
+  CLOSED
+}
+
+model Deployment {
+  id           String           @id @default(cuid())
+  volunteerId  String
+  volunteer    Volunteer        @relation(fields: [volunteerId], references: [id])
+  surgeEventId String
+  surgeEvent   SurgeEvent       @relation(fields: [surgeEventId], references: [id])
+  distanceKm   Float
+  status       DeploymentStatus @default(NOTIFIED)
+  notifiedAt   DateTime         @default(now())
+  respondedAt  DateTime?
+}
+
+enum DeploymentStatus {
+  NOTIFIED
+  ACCEPTED
+  DECLINED
+  TIMED_OUT
+  CHECKED_IN
+}
+
+model SensorReading {
+  id               String   @id @default(cuid())
+  sensorId         String
+  latitude         Float
+  longitude        Float
+  type             String
+  value            Float
+  threshold        Float
+  triggeredSurgeId String?
+  timestamp        DateTime @default(now())
+}
