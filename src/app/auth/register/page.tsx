@@ -32,6 +32,8 @@ export default function RegisterPage() {
   const [address, setAddress] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [customSkillInput, setCustomSkillInput] = useState('');
+  const [customResourceInput, setCustomResourceInput] = useState('');
 
   const toggleSkill = (skill: string) => {
     setForm((f) => ({
@@ -49,6 +51,22 @@ export default function RegisterPage() {
         ? f.resources.filter((r) => r !== resource)
         : [...f.resources, resource],
     }));
+  };
+
+  const addCustomSkill = () => {
+    const val = customSkillInput.trim();
+    if (val && !form.skills.includes(val)) {
+      setForm((f) => ({ ...f, skills: [...f.skills, val] }));
+    }
+    setCustomSkillInput('');
+  };
+
+  const addCustomResource = () => {
+    const val = customResourceInput.trim();
+    if (val && !form.resources.includes(val)) {
+      setForm((f) => ({ ...f, resources: [...f.resources, val] }));
+    }
+    setCustomResourceInput('');
   };
 
   const handleLocationChange = (lat: number, lng: number, addr?: string) => {
@@ -268,6 +286,34 @@ export default function RegisterPage() {
                         </button>
                       );
                     })}
+                    {/* Custom skills not in predefined list */}
+                    {form.skills.filter((s) => !(AVAILABLE_SKILLS as readonly string[]).includes(s)).map((skill) => (
+                      <span
+                        key={skill}
+                        className="inline-flex items-center gap-1 text-xs px-3 py-1.5 rounded-full border bg-blue-600/40 border-blue-500 text-blue-300 font-medium"
+                      >
+                        {skill}
+                        <button type="button" onClick={() => toggleSkill(skill)} className="text-blue-400 hover:text-white leading-none">×</button>
+                      </span>
+                    ))}
+                  </div>
+                  {/* Add custom skill */}
+                  <div className="flex items-center gap-2 mt-2">
+                    <input
+                      type="text"
+                      value={customSkillInput}
+                      onChange={(e) => setCustomSkillInput(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addCustomSkill(); } }}
+                      placeholder="Add a skill..."
+                      className="text-xs px-3 py-1.5 rounded-full border bg-slate-800 border-slate-600 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 w-44"
+                    />
+                    <button
+                      type="button"
+                      onClick={addCustomSkill}
+                      className="text-xs px-3 py-1.5 rounded-full border bg-slate-800 border-slate-600 text-slate-300 hover:border-blue-500 hover:text-blue-300 transition-all"
+                    >
+                      + Add
+                    </button>
                   </div>
                 </div>
 
@@ -294,6 +340,34 @@ export default function RegisterPage() {
                         </button>
                       );
                     })}
+                    {/* Custom resources not in predefined list */}
+                    {form.resources.filter((r) => !(AVAILABLE_RESOURCES as readonly string[]).includes(r)).map((resource) => (
+                      <span
+                        key={resource}
+                        className="inline-flex items-center gap-1 text-xs px-3 py-1.5 rounded-full border bg-amber-600/30 border-amber-500 text-amber-300 font-medium"
+                      >
+                        {resource}
+                        <button type="button" onClick={() => toggleResource(resource)} className="text-amber-400 hover:text-white leading-none">×</button>
+                      </span>
+                    ))}
+                  </div>
+                  {/* Add custom resource */}
+                  <div className="flex items-center gap-2 mt-2">
+                    <input
+                      type="text"
+                      value={customResourceInput}
+                      onChange={(e) => setCustomResourceInput(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addCustomResource(); } }}
+                      placeholder="Add equipment..."
+                      className="text-xs px-3 py-1.5 rounded-full border bg-slate-800 border-slate-600 text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 w-44"
+                    />
+                    <button
+                      type="button"
+                      onClick={addCustomResource}
+                      className="text-xs px-3 py-1.5 rounded-full border bg-slate-800 border-slate-600 text-slate-300 hover:border-amber-500 hover:text-amber-300 transition-all"
+                    >
+                      + Add
+                    </button>
                   </div>
                 </div>
               </div>

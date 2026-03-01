@@ -33,6 +33,8 @@ export default function SurgeEventForm({ onSuccess }: SurgeEventFormProps) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [mobilizeResult, setMobilizeResult] = useState<any>(null);
+  const [customSkillInput, setCustomSkillInput] = useState('');
+  const [customResourceInput, setCustomResourceInput] = useState('');
 
   // Auto-suggest skills + resources when type changes
   useEffect(() => {
@@ -70,6 +72,18 @@ export default function SurgeEventForm({ onSuccess }: SurgeEventFormProps) {
 
   const toggleResource = (resource: string) =>
     setResourcesNeeded((prev) => prev.includes(resource) ? prev.filter((r) => r !== resource) : [...prev, resource]);
+
+  const addCustomSkill = () => {
+    const val = customSkillInput.trim();
+    if (val && !skillsNeeded.includes(val)) setSkillsNeeded((prev) => [...prev, val]);
+    setCustomSkillInput('');
+  };
+
+  const addCustomResource = () => {
+    const val = customResourceInput.trim();
+    if (val && !resourcesNeeded.includes(val)) setResourcesNeeded((prev) => [...prev, val]);
+    setCustomResourceInput('');
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -189,6 +203,33 @@ export default function SurgeEventForm({ onSuccess }: SurgeEventFormProps) {
                   </button>
                 );
               })}
+              {/* Custom skills not in predefined list */}
+              {skillsNeeded.filter((s) => !(AVAILABLE_SKILLS as readonly string[]).includes(s)).map((skill) => (
+                <span
+                  key={skill}
+                  className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full border bg-blue-600/40 border-blue-500 text-blue-300"
+                >
+                  {skill}
+                  <button type="button" onClick={() => toggleSkill(skill)} className="text-blue-400 hover:text-white leading-none">×</button>
+                </span>
+              ))}
+            </div>
+            <div className="flex items-center gap-2 mt-1.5">
+              <input
+                type="text"
+                value={customSkillInput}
+                onChange={(e) => setCustomSkillInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addCustomSkill(); } }}
+                placeholder="Add a skill..."
+                className="text-xs px-2.5 py-1 rounded-full border bg-slate-700 border-slate-600 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 w-36"
+              />
+              <button
+                type="button"
+                onClick={addCustomSkill}
+                className="text-xs px-2.5 py-1 rounded-full border bg-slate-700 border-slate-600 text-slate-300 hover:border-blue-500 hover:text-blue-300 transition-all"
+              >
+                + Add
+              </button>
             </div>
           </div>
 
@@ -213,6 +254,33 @@ export default function SurgeEventForm({ onSuccess }: SurgeEventFormProps) {
                   </button>
                 );
               })}
+              {/* Custom resources not in predefined list */}
+              {resourcesNeeded.filter((r) => !(AVAILABLE_RESOURCES as readonly string[]).includes(r)).map((resource) => (
+                <span
+                  key={resource}
+                  className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full border bg-amber-600/30 border-amber-500 text-amber-300"
+                >
+                  {resource}
+                  <button type="button" onClick={() => toggleResource(resource)} className="text-amber-400 hover:text-white leading-none">×</button>
+                </span>
+              ))}
+            </div>
+            <div className="flex items-center gap-2 mt-1.5">
+              <input
+                type="text"
+                value={customResourceInput}
+                onChange={(e) => setCustomResourceInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addCustomResource(); } }}
+                placeholder="Add equipment..."
+                className="text-xs px-2.5 py-1 rounded-full border bg-slate-700 border-slate-600 text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 w-36"
+              />
+              <button
+                type="button"
+                onClick={addCustomResource}
+                className="text-xs px-2.5 py-1 rounded-full border bg-slate-700 border-slate-600 text-slate-300 hover:border-amber-500 hover:text-amber-300 transition-all"
+              >
+                + Add
+              </button>
             </div>
           </div>
         </div>
